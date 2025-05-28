@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>楓之谷風格炫彩爆裂消消樂</title>
+    <title>爆裂消消樂</title>
     <style>
         * {
             margin: 0;
@@ -146,6 +146,108 @@
             background: #00d2d3;
             border: 2px solid #00c5c6;
             box-shadow: 0 3px 10px rgba(0, 210, 211, 0.4), inset 0 1px 3px rgba(255, 255, 255, 0.3);
+        }
+
+        /* 特殊方塊樣式 */
+        .gem.bomb {
+            background: radial-gradient(circle, #2c2c2c, #000000);
+            border: 2px solid #444;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.6), inset 0 1px 3px rgba(255, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .gem.bomb::before {
+            content: '💣';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 16px;
+            animation: bombPulse 1s infinite alternate;
+        }
+
+        @keyframes bombPulse {
+            0% { transform: translate(-50%, -50%) scale(0.8); }
+            100% { transform: translate(-50%, -50%) scale(1.2); }
+        }
+
+        .gem.lightning {
+            background: linear-gradient(45deg, #ffd700, #ffed4e, #ffd700);
+            border: 2px solid #ffb700;
+            box-shadow: 0 3px 10px rgba(255, 215, 0, 0.6), inset 0 1px 3px rgba(255, 255, 255, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .gem.lightning::before {
+            content: '⚡';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 16px;
+            animation: lightningFlicker 0.5s infinite alternate;
+        }
+
+        @keyframes lightningFlicker {
+            0% { opacity: 0.7; transform: translate(-50%, -50%) rotate(-5deg); }
+            100% { opacity: 1; transform: translate(-50%, -50%) rotate(5deg); }
+        }
+
+        .gem.rainbow {
+            background: linear-gradient(45deg, 
+                #ff6b6b, #4ecdc4, #45b7d1, 
+                #96ceb4, #ffeaa7, #fd79a8, 
+                #fdcb6e, #e17055);
+            background-size: 400% 400%;
+            animation: rainbowFlow 2s ease infinite;
+            border: 2px solid #fff;
+            box-shadow: 0 3px 10px rgba(255, 255, 255, 0.5), inset 0 1px 3px rgba(255, 255, 255, 0.3);
+            position: relative;
+        }
+
+        @keyframes rainbowFlow {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .gem.rainbow::before {
+            content: '🌟';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 14px;
+            animation: starSpin 2s linear infinite;
+        }
+
+        @keyframes starSpin {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        .gem.fire {
+            background: radial-gradient(circle, #ff6b35, #f7931e, #ff6b35);
+            border: 2px solid #e55100;
+            box-shadow: 0 3px 10px rgba(255, 107, 53, 0.6), inset 0 1px 3px rgba(255, 255, 255, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .gem.fire::before {
+            content: '🔥';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 14px;
+            animation: fireFlicker 0.3s infinite alternate;
+        }
+
+        @keyframes fireFlicker {
+            0% { transform: translate(-50%, -50%) scale(0.9); }
+            100% { transform: translate(-50%, -50%) scale(1.1); }
         }
 
         .gem.exploding {
@@ -301,6 +403,12 @@
                 opacity: 0;
                 transform: scale(1.5);
             }
+        }
+
+        @keyframes lightningFlash {
+            0% { opacity: 0; transform: scaleY(0); }
+            50% { opacity: 1; transform: scaleY(1); }
+            100% { opacity: 0; transform: scaleY(1); }
         }
         }
 
@@ -462,11 +570,28 @@
                 font-size: 16px;
             }
             .game-over-text {
-                font-size: 36px;
+                font-size: 28px;
             }
             .gem {
                 min-width: 18px;
                 min-height: 18px;
+            }
+            .damage-number {
+                font-size: 16px;
+            }
+            .combo-text {
+                font-size: 20px;
+            }
+            .mega-explosion-text {
+                font-size: 24px;
+            }
+            .gem.bomb::before,
+            .gem.lightning::before {
+                font-size: 12px;
+            }
+            .gem.rainbow::before,
+            .gem.fire::before {
+                font-size: 10px;
             }
         }
 
@@ -478,6 +603,23 @@
             }
             .game-board {
                 padding: 4px;
+            }
+            .damage-number {
+                font-size: 14px;
+            }
+            .combo-text {
+                font-size: 18px;
+            }
+            .mega-explosion-text {
+                font-size: 20px;
+            }
+            .gem.bomb::before,
+            .gem.lightning::before {
+                font-size: 10px;
+            }
+            .gem.rainbow::before,
+            .gem.fire::before {
+                font-size: 8px;
             }
         }
 
@@ -505,10 +647,6 @@
             </div>
         </div>
         
-        <div style="color: rgba(255, 255, 255, 0.7); font-size: 14px; margin-bottom: 10px; text-align: center;">
-            💡 點擊方塊後滑動來移動
-        </div>
-        
         <div class="game-board" id="gameBoard"></div>
         
         <button class="reset-btn" onclick="resetGame()">重新開始</button>
@@ -529,6 +667,7 @@
                 this.rows = 15;
                 this.cols = 10;
                 this.colors = ['red', 'blue', 'green', 'yellow', 'purple', 'cyan'];
+                this.specialGems = ['bomb', 'lightning', 'rainbow', 'fire'];
                 this.score = 0;
                 this.selectedGem = null;
                 this.isAnimating = false;
@@ -562,6 +701,9 @@
 
             hasInitialMatch(row, col) {
                 const color = this.board[row][col];
+                // 特殊方塊不參與初始匹配檢查
+                if (this.specialGems.includes(color)) return false;
+                
                 if (col >= 2 && 
                     this.board[row][col-1] === color && 
                     this.board[row][col-2] === color) {
@@ -573,6 +715,44 @@
                     return true;
                 }
                 return false;
+            }
+
+            generateRandomGem() {
+                // 初始化時只生成普通方塊
+                return this.colors[Math.floor(Math.random() * this.colors.length)];
+            }
+
+            generateRandomGemWithSpecial() {
+                // 遊戲過程中有機率生成特殊方塊
+                if (Math.random() < 0.95) {
+                    return this.colors[Math.floor(Math.random() * this.colors.length)];
+                } else {
+                    return this.specialGems[Math.floor(Math.random() * this.specialGems.length)];
+                }
+            }
+
+            showSpecialGemText(type, row, col) {
+                const gem = document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
+                if (!gem) return;
+                
+                const rect = gem.getBoundingClientRect();
+                const text = {
+                    'bomb': '💥 炸彈誕生!',
+                    'lightning': '⚡ 閃電之力!',
+                    'rainbow': '🌟 彩虹之星!',
+                    'fire': '🔥 烈焰之魂!'
+                };
+                
+                const specialText = document.createElement('div');
+                specialText.className = 'combo-text';
+                specialText.textContent = text[type];
+                specialText.style.left = (rect.left + rect.width / 2) + 'px';
+                specialText.style.top = (rect.top + rect.height / 2) + 'px';
+                specialText.style.transform = 'translate(-50%, -50%)';
+                specialText.style.color = '#ffd700';
+                
+                document.body.appendChild(specialText);
+                setTimeout(() => specialText.remove(), 2000);
             }
 
             renderBoard() {
@@ -636,7 +816,14 @@
                 e.preventDefault();
                 
                 if (!this.isDragging) {
-                    // 如果沒有拖拽，就是普通點擊
+                    // 如果沒有拖拽，檢查是否點擊特殊方塊
+                    const gemType = this.board[this.touchStartGem.row][this.touchStartGem.col];
+                    if (this.specialGems.includes(gemType)) {
+                        await this.activateSpecialGemDirectly(this.touchStartGem.row, this.touchStartGem.col);
+                        this.clearSelection();
+                        this.resetTouch();
+                        return;
+                    }
                     return;
                 }
                 
@@ -687,6 +874,40 @@
                 this.resetTouch();
             }
 
+            async activateSpecialGemDirectly(row, col) {
+                const gemType = this.board[row][col];
+                if (!this.specialGems.includes(gemType)) return;
+                
+                this.isAnimating = true;
+                
+                // 激活特殊方塊
+                const specialMatches = await this.activateSpecialGem(row, col);
+                specialMatches.push({ row, col }); // 包含自己
+                
+                // 爆炸效果
+                await this.explodeMatches(specialMatches);
+                this.showDamageNumbers(specialMatches);
+                
+                // 清除方塊
+                specialMatches.forEach(match => {
+                    this.board[match.row][match.col] = null;
+                });
+                
+                // 重新填充和處理連鎖
+                await this.dropGems();
+                this.fillBoard();
+                this.renderBoard();
+                
+                await this.delay(300);
+                
+                // 處理可能的連鎖反應
+                await this.processMatches();
+                this.updatePossibleMoves();
+                this.checkGameOver();
+                
+                this.isAnimating = false;
+            }
+
             clearSelection() {
                 const selectedGems = document.querySelectorAll('.gem.selected');
                 selectedGems.forEach(gem => gem.classList.remove('selected'));
@@ -703,6 +924,13 @@
             async handleGemClick(row, col) {
                 // 簡化的點擊邏輯，主要用於非觸控設備
                 if (this.isAnimating || this.gameOver) return;
+
+                // 檢查是否點擊特殊方塊
+                const gemType = this.board[row][col];
+                if (this.specialGems.includes(gemType)) {
+                    await this.activateSpecialGemDirectly(row, col);
+                    return;
+                }
 
                 const clickedGem = document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
                 
@@ -752,11 +980,14 @@
                 const matches = [];
                 const visited = new Set();
                 
+                // 檢查水平匹配
                 for (let row = 0; row < this.rows; row++) {
                     let count = 1;
                     let currentColor = this.board[row][0];
                     for (let col = 1; col < this.cols; col++) {
-                        if (this.board[row][col] === currentColor) {
+                        const cellColor = this.board[row][col];
+                        // 彩虹方塊可以匹配任意顏色
+                        if (cellColor === currentColor || cellColor === 'rainbow' || currentColor === 'rainbow') {
                             count++;
                         } else {
                             if (count >= 3) {
@@ -769,7 +1000,7 @@
                                 }
                             }
                             count = 1;
-                            currentColor = this.board[row][col];
+                            currentColor = cellColor;
                         }
                     }
                     if (count >= 3) {
@@ -783,11 +1014,14 @@
                     }
                 }
                 
+                // 檢查垂直匹配
                 for (let col = 0; col < this.cols; col++) {
                     let count = 1;
                     let currentColor = this.board[0][col];
                     for (let row = 1; row < this.rows; row++) {
-                        if (this.board[row][col] === currentColor) {
+                        const cellColor = this.board[row][col];
+                        // 彩虹方塊可以匹配任意顏色
+                        if (cellColor === currentColor || cellColor === 'rainbow' || currentColor === 'rainbow') {
                             count++;
                         } else {
                             if (count >= 3) {
@@ -800,7 +1034,7 @@
                                 }
                             }
                             count = 1;
-                            currentColor = this.board[row][col];
+                            currentColor = cellColor;
                         }
                     }
                     if (count >= 3) {
@@ -815,6 +1049,150 @@
                 }
                 
                 return matches;
+            }
+
+            async activateSpecialGem(row, col) {
+                const gemType = this.board[row][col];
+                let specialMatches = [];
+                
+                switch(gemType) {
+                    case 'bomb':
+                        specialMatches = this.getBombArea(row, col);
+                        await this.createBombEffect(row, col);
+                        break;
+                    case 'lightning':
+                        specialMatches = this.getLightningArea(row, col);
+                        await this.createLightningEffect(row, col);
+                        break;
+                    case 'fire':
+                        specialMatches = this.getFireArea(row, col);
+                        await this.createFireEffect(row, col);
+                        break;
+                    case 'rainbow':
+                        // 彩虹方塊在普通匹配中已經處理
+                        break;
+                }
+                
+                return specialMatches;
+            }
+
+            getBombArea(row, col) {
+                const area = [];
+                for (let dr = -1; dr <= 1; dr++) {
+                    for (let dc = -1; dc <= 1; dc++) {
+                        const newRow = row + dr;
+                        const newCol = col + dc;
+                        if (newRow >= 0 && newRow < this.rows && 
+                            newCol >= 0 && newCol < this.cols) {
+                            area.push({ row: newRow, col: newCol });
+                        }
+                    }
+                }
+                return area;
+            }
+
+            getLightningArea(row, col) {
+                const area = [];
+                // 消除整行
+                for (let c = 0; c < this.cols; c++) {
+                    area.push({ row, col: c });
+                }
+                // 消除整列
+                for (let r = 0; r < this.rows; r++) {
+                    if (r !== row) { // 避免重複添加中心點
+                        area.push({ row: r, col });
+                    }
+                }
+                return area;
+            }
+
+            getFireArea(row, col) {
+                const area = [{ row, col }];
+                const directions = [[-1,0], [1,0], [0,-1], [0,1]];
+                
+                // 火焰蔓延到相鄰同色方塊
+                const originalColor = this.board[row][col];
+                directions.forEach(([dr, dc]) => {
+                    const newRow = row + dr;
+                    const newCol = col + dc;
+                    if (newRow >= 0 && newRow < this.rows && 
+                        newCol >= 0 && newCol < this.cols &&
+                        this.colors.includes(this.board[newRow][newCol])) {
+                        area.push({ row: newRow, col: newCol });
+                    }
+                });
+                
+                return area;
+            }
+
+            async createBombEffect(row, col) {
+                await this.createShockwave({ row, col });
+                this.showMegaExplosionText('💣 大爆炸! 💣');
+            }
+
+            async createLightningEffect(row, col) {
+                // 創建十字閃電效果
+                const gem = document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
+                if (gem) {
+                    const rect = gem.getBoundingClientRect();
+                    
+                    // 水平閃電
+                    const hLightning = document.createElement('div');
+                    hLightning.style.cssText = `
+                        position: absolute;
+                        left: 0;
+                        top: ${rect.top + rect.height/2}px;
+                        width: 100vw;
+                        height: 4px;
+                        background: linear-gradient(90deg, transparent, #ffd700, transparent);
+                        z-index: 500;
+                        animation: lightningFlash 0.8s ease-out;
+                    `;
+                    
+                    // 垂直閃電
+                    const vLightning = document.createElement('div');
+                    vLightning.style.cssText = `
+                        position: absolute;
+                        left: ${rect.left + rect.width/2}px;
+                        top: 0;
+                        width: 4px;
+                        height: 100vh;
+                        background: linear-gradient(180deg, transparent, #ffd700, transparent);
+                        z-index: 500;
+                        animation: lightningFlash 0.8s ease-out;
+                    `;
+                    
+                    document.body.appendChild(hLightning);
+                    document.body.appendChild(vLightning);
+                    
+                    setTimeout(() => {
+                        hLightning.remove();
+                        vLightning.remove();
+                    }, 800);
+                }
+                
+                this.showMegaExplosionText('⚡ 雷霆萬鈞! ⚡');
+                await this.delay(400);
+            }
+
+            async createFireEffect(row, col) {
+                // 創建火焰蔓延效果
+                const fireRing = document.createElement('div');
+                fireRing.className = 'nova-effect';
+                fireRing.style.background = 'radial-gradient(circle, rgba(255, 107, 53, 0.8), rgba(247, 147, 30, 0.6), transparent)';
+                
+                const gem = document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
+                if (gem) {
+                    const rect = gem.getBoundingClientRect();
+                    fireRing.style.left = (rect.left + rect.width / 2 - 10) + 'px';
+                    fireRing.style.top = (rect.top + rect.height / 2 - 10) + 'px';
+                }
+                
+                document.body.appendChild(fireRing);
+                setTimeout(() => fireRing.remove(), 1200);
+                
+                this.showMegaExplosionText('🔥 烈火燎原! 🔥');
+                await this.delay(600);
             }
 
             async processMatches() {
