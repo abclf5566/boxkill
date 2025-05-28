@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>楓之谷風格炫彩爆裂消消樂</title>
+    <title>爆裂消消樂</title>
     <style>
         * {
             margin: 0;
@@ -75,13 +75,16 @@
             border: 3px solid rgba(255, 255, 255, 0.3);
             box-shadow: 0 0 30px rgba(0, 255, 255, 0.3);
             position: relative;
-            max-height: 70vh;
+            width: min(90vw, 350px);
+            height: min(75vh, 525px);
             overflow: hidden;
         }
 
         .gem {
-            width: 28px;
-            height: 28px;
+            width: 100%;
+            height: 100%;
+            min-width: 20px;
+            min-height: 20px;
             border-radius: 8px;
             cursor: pointer;
             transition: all 0.2s cubic-bezier(0.68, -0.55, 0.265, 1.55);
@@ -89,6 +92,7 @@
             box-shadow: 0 3px 10px rgba(0, 0, 0, 0.4), inset 0 1px 3px rgba(255, 255, 255, 0.3);
             border: 1px solid rgba(255, 255, 255, 0.2);
             background-size: 100% 100%;
+            touch-action: none;
         }
 
         .gem:active {
@@ -138,10 +142,10 @@
             border: 2px solid #9c4de6;
             box-shadow: 0 3px 10px rgba(165, 94, 234, 0.4), inset 0 1px 3px rgba(255, 255, 255, 0.3);
         }
-        .gem.orange { 
-            background: #ff6348;
-            border: 2px solid #ff5233;
-            box-shadow: 0 3px 10px rgba(255, 99, 72, 0.4), inset 0 1px 3px rgba(255, 255, 255, 0.3);
+        .gem.cyan { 
+            background: #00d2d3;
+            border: 2px solid #00c5c6;
+            box-shadow: 0 3px 10px rgba(0, 210, 211, 0.4), inset 0 1px 3px rgba(255, 255, 255, 0.3);
         }
 
         .gem.exploding {
@@ -448,19 +452,32 @@
         }
 
         @media (max-width: 480px) {
-            .gem {
-                width: 24px;
-                height: 24px;
-            }
             .game-board {
                 gap: 1px;
                 padding: 6px;
+                width: 95vw;
+                height: 70vh;
             }
             .score-text, .moves-text {
                 font-size: 16px;
             }
             .game-over-text {
                 font-size: 36px;
+            }
+            .gem {
+                min-width: 18px;
+                min-height: 18px;
+            }
+        }
+
+        @media (max-width: 320px) {
+            .gem {
+                min-width: 16px;
+                min-height: 16px;
+                border-radius: 6px;
+            }
+            .game-board {
+                padding: 4px;
             }
         }
 
@@ -488,6 +505,10 @@
             </div>
         </div>
         
+        <div style="color: rgba(255, 255, 255, 0.7); font-size: 14px; margin-bottom: 10px; text-align: center;">
+            💡 點擊方塊後滑動來移動
+        </div>
+        
         <div class="game-board" id="gameBoard"></div>
         
         <button class="reset-btn" onclick="resetGame()">重新開始</button>
@@ -507,13 +528,20 @@
                 this.board = [];
                 this.rows = 15;
                 this.cols = 10;
-                this.colors = ['red', 'blue', 'green', 'yellow', 'purple', 'orange'];
+                this.colors = ['red', 'blue', 'green', 'yellow', 'purple', 'cyan'];
                 this.score = 0;
                 this.selectedGem = null;
                 this.isAnimating = false;
                 this.combo = 0;
                 this.gameOver = false;
                 this.possibleMoves = 0;
+                
+                // 觸控相關
+                this.touchStartX = 0;
+                this.touchStartY = 0;
+                this.touchStartGem = null;
+                this.isDragging = false;
+                this.minSwipeDistance = 30;
                 
                 this.initializeBoard();
                 this.renderBoard();
@@ -557,13 +585,123 @@
                         gem.className = `gem ${this.board[row][col]}`;
                         gem.dataset.row = row;
                         gem.dataset.col = col;
+                        
+                        // 添加觸控事件
+                        gem.addEventListener('touchstart', (e) => this.handleTouchStart(e, row, col), { passive: false });
+                        gem.addEventListener('touchmove', (e) => this.handleTouchMove(e), { passive: false });
+                        gem.addEventListener('touchend', (e) => this.handleTouchEnd(e), { passive: false });
+                        
+                        // 保留點擊事件作為備用
                         gem.addEventListener('click', () => this.handleGemClick(row, col));
+                        
                         gameBoard.appendChild(gem);
                     }
                 }
             }
 
+            handleTouchStart(e, row, col) {
+                if (this.isAnimating || this.gameOver) {
+                    e.preventDefault();
+                    return;
+                }
+                
+                e.preventDefault();
+                const touch = e.touches[0];
+                this.touchStartX = touch.clientX;
+                this.touchStartY = touch.clientY;
+                this.touchStartGem = { row, col };
+                this.isDragging = false;
+                
+                // 選中當前方塊
+                this.clearSelection();
+                const gem = document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
+                gem.classList.add('selected');
+                this.selectedGem = { row, col };
+            }
+
+            handleTouchMove(e) {
+                if (!this.touchStartGem || this.isAnimating || this.gameOver) {
+                    return;
+                }
+                
+                e.preventDefault();
+                this.isDragging = true;
+            }
+
+            async handleTouchEnd(e) {
+                if (!this.touchStartGem || this.isAnimating || this.gameOver) {
+                    return;
+                }
+                
+                e.preventDefault();
+                
+                if (!this.isDragging) {
+                    // 如果沒有拖拽，就是普通點擊
+                    return;
+                }
+                
+                const touch = e.changedTouches[0];
+                const deltaX = touch.clientX - this.touchStartX;
+                const deltaY = touch.clientY - this.touchStartY;
+                const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+                
+                // 檢查是否達到最小滑動距離
+                if (distance < this.minSwipeDistance) {
+                    this.clearSelection();
+                    this.resetTouch();
+                    return;
+                }
+                
+                // 判斷滑動方向
+                const absX = Math.abs(deltaX);
+                const absY = Math.abs(deltaY);
+                let targetRow = this.touchStartGem.row;
+                let targetCol = this.touchStartGem.col;
+                
+                if (absX > absY) {
+                    // 水平滑動
+                    if (deltaX > 0) {
+                        // 向右
+                        targetCol = Math.min(this.cols - 1, this.touchStartGem.col + 1);
+                    } else {
+                        // 向左
+                        targetCol = Math.max(0, this.touchStartGem.col - 1);
+                    }
+                } else {
+                    // 垂直滑動
+                    if (deltaY > 0) {
+                        // 向下
+                        targetRow = Math.min(this.rows - 1, this.touchStartGem.row + 1);
+                    } else {
+                        // 向上
+                        targetRow = Math.max(0, this.touchStartGem.row - 1);
+                    }
+                }
+                
+                // 執行交換
+                if (targetRow !== this.touchStartGem.row || targetCol !== this.touchStartGem.col) {
+                    await this.swapGems(this.touchStartGem.row, this.touchStartGem.col, targetRow, targetCol);
+                }
+                
+                this.clearSelection();
+                this.resetTouch();
+            }
+
+            clearSelection() {
+                const selectedGems = document.querySelectorAll('.gem.selected');
+                selectedGems.forEach(gem => gem.classList.remove('selected'));
+                this.selectedGem = null;
+            }
+
+            resetTouch() {
+                this.touchStartX = 0;
+                this.touchStartY = 0;
+                this.touchStartGem = null;
+                this.isDragging = false;
+            }
+
             async handleGemClick(row, col) {
+                // 簡化的點擊邏輯，主要用於非觸控設備
                 if (this.isAnimating || this.gameOver) return;
 
                 const clickedGem = document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
@@ -1071,18 +1209,15 @@
         }
 
         // 防止雙擊縮放和其他觸控問題
-        let lastTouchEnd = 0;
-        document.addEventListener('touchend', function (event) {
-            const now = (new Date()).getTime();
-            if (now - lastTouchEnd <= 300) {
-                event.preventDefault();
-            }
-            lastTouchEnd = now;
-        }, false);
-
-        // 防止拖拽選擇
         document.addEventListener('selectstart', e => e.preventDefault());
         document.addEventListener('dragstart', e => e.preventDefault());
+        
+        // 防止頁面滾動
+        document.addEventListener('touchmove', function(e) {
+            if (e.target.closest('.game-board')) {
+                e.preventDefault();
+            }
+        }, { passive: false });
     </script>
 </body>
 </html>
